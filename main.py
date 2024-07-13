@@ -1,5 +1,5 @@
 
-from fastapi import FastAPI, UploadFile, File, Depends, HTTPException, status, Body
+from fastapi import FastAPI, Form, UploadFile, File, Depends, HTTPException, status, Body
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, HTTPBearer
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import IntegrityError, ProgrammingError
@@ -11,6 +11,9 @@ import datetime
 import jwt
 import hashlib
 from time import sleep
+import os
+import shutil
+import uuid
 
 from src.data.models import *
 from src.data.database import db
@@ -18,7 +21,7 @@ from src.data.tables import User
 from src.data import constants as const
 from src.utils import common
 from src.business import *
-from src.business import ai_ops
+from src.business import ai_ops, import_cv
 
 logging.basicConfig(
     level=logging.INFO, 
@@ -88,6 +91,33 @@ async def send_ai_request(
         authorization=authorization,
         main_db=MAIN_DB
         )
+
+@app.post("/upload-cv")
+async def upload_cv(
+        file: UploadFile = File(...),
+        authorization: HTTPBearer = Depends(token_auth_scheme)
+    ):
+    
+    cv_dir, cv_name_id = import_cv.import_cv_data(
+        file=file,
+        authorization=authorization,
+        main_db=MAIN_DB
+        )
+        # Define the path where you want to save the file
+    destination_file_path = os.path.join(cv_dir, cv_name_id + ".pdf")    # Open the file in write mode and save its content
+    try:
+        with open(destination_file_path, "wb") as buffer:
+            await file.seek(0)  # Reset file pointer to the start
+            file_content = await file.read()  # Await the read operation
+            buffer.write(file_content)  # Write the content to the file
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error saving {file.filename}: {str(e)}",
+        )
+    logging.info(f"Data has been saved successfully to: \n\n{cv_dir}")
+    return {"importedDataStatus": "Success",
+                "description": "Data has been saved successfully"}
 
 
 

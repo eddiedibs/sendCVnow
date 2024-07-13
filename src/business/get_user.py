@@ -37,7 +37,9 @@ def get_user_info_handler(username, authorization, main_db):
         logging.error(f"User from DB appears None for username '{token_info['sub']}'")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    resp_body = {"id":db_user.id,
+    resp_body = {
+            "id":db_user.id,
+            "cv_name_id":db_user.cv_name_id,
             "firstName": db_user.firstName,
             "lastName": db_user.lastName,
             "username": db_user.username,

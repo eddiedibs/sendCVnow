@@ -22,7 +22,12 @@ class signup_credentials_model(BaseModel):
 
 class ai_request_model(BaseModel):
    username: str
+   aiModel: str
    instruction: str
+
+# class upload_cv_model(BaseModel):
+#    username: str
+#    cvNameId: str
 
 class error_model(BaseModel):
    httpStatusCode: int

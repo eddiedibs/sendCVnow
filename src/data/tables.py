@@ -19,13 +19,13 @@ class User(DeclarativeBaseIns):
    __tablename__ = 'users'
 
    id = Column(Integer, primary_key=True, index=True)
+   cv_name_id = Column(String)
    firstName = Column(String)
    lastName = Column(String)
    username = Column(String, unique=True)
    email = Column(String, unique=True)
    phoneNumber = Column(String, unique=True)
    country = Column(String)
-   currency = Column(String)
    hashed_password = Column(String)
    userType = Column(String)
    isActive = Column(Boolean, default=True)

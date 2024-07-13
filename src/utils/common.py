@@ -7,6 +7,8 @@ from src.data import constants as const
 from ollama import Client
 import sys
 
+from langchain_community.document_loaders import UnstructuredPDFLoader
+from langchain_community.document_loaders import OnlinePDFLoader
 
 
 
@@ -57,14 +59,25 @@ def send_confirmation_email():
     )
     fm.send_message(message)
 
-def send_ai_req(req_instruction):
+def send_ai_req(req_instruction, ai_model):
     client = Client(host=f"{const.OLLAMA_HOST}:{const.OLLAMA_PORT}")
     msgs = [{"role": "system", "content": const.OLLAMA_INIT_INSTRUCT},
             
             {"role": "user", "content": req_instruction}]
-    output = client.chat(model="llama3:instruct", messages=msgs, stream=False)
+    output = client.chat(model=ai_model, messages=msgs, stream=False)
 
     # for chunk in output:
     #     content = chunk['message']['content']
     #     print(content, end='', flush=True)
     return output
+
+def ingest_pdf(path_location:str):
+
+    local_path = path_location
+    # Local PDF file uploads
+    if local_path:
+        loader = UnstructuredPDFLoader(file_path=local_path)
+        data = loader.load()
+        return data
+    else:
+        return None
