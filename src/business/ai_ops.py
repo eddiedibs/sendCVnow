@@ -7,7 +7,9 @@ from sqlalchemy.exc import IntegrityError, ProgrammingError
 from src.data.tables import User
 from src.utils import common
 from src.data.tables import User
-
+from src.business.RAG import ingest_pdf
+from src.business.RAG import vector_embeddings
+from src.business.RAG import data_retrieval
 
 logging.basicConfig(
     level=logging.INFO, 
@@ -38,11 +40,16 @@ def send_request(item, authorization, main_db):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
 
-    ai_resp = common.send_ai_req(req_instruction=item.instruction, ai_model=item.aiModel)
+    # context_data = ingest_pdf.ingest_pdf(db_user.cv_name_id + ".pdf")
+    context_data = ingest_pdf.ingest_pdf(db_user.cv_name_id + ".pdf")[0].page_content
+    # vector_db = vector_embeddings.vector_embed(context_data)
+
+    # ai_resp = data_retrieval.retrieve_data(llm_model=item.aiModel, vector_db=vector_db)
+    ai_resp = common.send_ai_req(cv_context=context_data, req_instruction=item.instruction, ai_model=item.aiModel)
 
     resp_body = {"id":db_user.id,
                 "instruction": item.instruction,
-                "ai_response": ai_resp,
+                "ai_response": ai_resp["message"]["content"],
                 }
     logging.debug(f"AI request sent successfully:  \n\n{resp_body}")
     return resp_body

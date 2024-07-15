@@ -11,6 +11,7 @@ OLLAMA_HOST = os.getenv('OLLAMA_HOST')
 OLLAMA_PORT = os.getenv('OLLAMA_PORT')
 OLLAMA_INIT_INSTRUCT = os.getenv('OLLAMA_INIT_INSTRUCT')
 BASE_DIR = Path(__file__).resolve().parent.parent
+CV_DIR = os.path.join(BASE_DIR, "CVs")
 
 
 # conf = ConnectionConfig(
