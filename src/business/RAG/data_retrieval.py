@@ -10,7 +10,7 @@ from src.data import constants as const
 def retrieve_data(llm_model, vector_db):
     # LLM from Ollama
     # local_model = "mistral"
-    llm = ChatOllama(model=llm_model, base_url=f"http://{const.OLLAMA_HOST}:{const.OLLAMA_PORT}")
+    llm = ChatOllama(model=llm_model, base_url=f"{const.OLLAMA_HOST}:{const.OLLAMA_PORT}")
 
     QUERY_PROMPT = PromptTemplate(
         input_variables=["question"],
@@ -38,5 +38,5 @@ def retrieve_data(llm_model, vector_db):
         | StrOutputParser()
     )
 
-    chain.invoke("What is this about?")
+    return chain.invoke("What is this about?")
 

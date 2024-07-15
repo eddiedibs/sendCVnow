@@ -40,16 +40,16 @@ def send_request(item, authorization, main_db):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
 
-    # context_data = ingest_pdf.ingest_pdf(db_user.cv_name_id + ".pdf")
-    context_data = ingest_pdf.ingest_pdf(db_user.cv_name_id + ".pdf")[0].page_content
-    # vector_db = vector_embeddings.vector_embed(context_data)
+    context_data = ingest_pdf.ingest_pdf(db_user.cv_name_id + ".pdf")
+    # context_data = ingest_pdf.ingest_pdf(db_user.cv_name_id + ".pdf")[0].page_content
+    vector_db = vector_embeddings.vector_embed(context_data)
 
-    # ai_resp = data_retrieval.retrieve_data(llm_model=item.aiModel, vector_db=vector_db)
-    ai_resp = common.send_ai_req(cv_context=context_data, req_instruction=item.instruction, ai_model=item.aiModel)
+    ai_resp = data_retrieval.retrieve_data(llm_model=item.aiModel, vector_db=vector_db)
+    # ai_resp = common.send_ai_req(cv_context=context_data, req_instruction=item.instruction, ai_model=item.aiModel)
 
     resp_body = {"id":db_user.id,
                 "instruction": item.instruction,
-                "ai_response": ai_resp["message"]["content"],
+                "ai_response": ai_resp,
                 }
     logging.debug(f"AI request sent successfully:  \n\n{resp_body}")
     return resp_body
